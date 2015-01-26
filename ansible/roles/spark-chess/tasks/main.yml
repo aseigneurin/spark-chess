@@ -1,0 +1,18 @@
+---
+
+  - name: Check if Spark Chess code is installed
+    stat: path={{ansible_env.HOME}}/spark-chess-master
+    register: st
+
+  - name: Download Spark Chess code
+    get_url:
+      url="https://github.com/aseigneurin/spark-chess/archive/master.zip"
+      dest={{ansible_env.HOME}}/spark-chess.zip
+    when: not st.stat.exists
+
+  - name: Extract Spark Chess code
+    command: unzip {{ansible_env.HOME}}/spark-chess.zip
+    when: not st.stat.exists
+
+  - name: Build Spark Chess code
+    shell: cd {{ansible_env.HOME}}/spark-chess-master && {{ansible_env.HOME}}/apache-maven-3.2.5/bin/mvn package

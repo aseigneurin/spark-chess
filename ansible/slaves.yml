@@ -1,0 +1,35 @@
+---
+  - hosts: spark-chess-slaves
+
+    roles:
+
+      - java
+      - spark
+      - hadoop
+
+    tasks:
+
+      - name: Check if HDFS Datanode is running
+        command: "{{ansible_env.HOME}}/launch-datanode.sh status"
+        register: dn
+        changed_when: false
+
+      - name: Launch HDFS Datanode
+        command: "{{ansible_env.HOME}}/launch-datanode.sh start"
+        when: dn.stdout.find("App is running") == -1
+        sudo: yes
+        register: p
+      #- debug: var=p.stdout
+
+
+      - name: Check if Spark Worker is running
+        command: "{{ansible_env.HOME}}/launch-spark-worker.sh status"
+        register: sm
+        changed_when: false
+
+      - name: Launch Spark Worker
+        command: "{{ansible_env.HOME}}/launch-spark-worker.sh start"
+        when: sm.stdout.find("App is running") == -1
+        sudo: yes
+        register: p
+      #- debug: var=p.stdout

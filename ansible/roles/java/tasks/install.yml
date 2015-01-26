@@ -1,0 +1,18 @@
+---
+
+  - command: apt-get -y -q update
+    sudo: yes
+  - command: apt-get -y -q upgrade
+    sudo: yes
+  - command: apt-get -y -q install software-properties-common htop
+    sudo: yes
+  - command: add-apt-repository -y ppa:webupd8team/java
+    sudo: yes
+  - command: apt-get -y -q update
+    sudo: yes
+  - command: echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
+    sudo: yes
+  - command: apt-get -y -q install oracle-java8-installer
+    sudo: yes
+  - command: update-java-alternatives -s java-8-oracle
+    sudo: yes

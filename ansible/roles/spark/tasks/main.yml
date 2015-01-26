@@ -1,0 +1,33 @@
+---
+
+  - name: Check if Spark is installed
+    stat: path={{ansible_env.HOME}}/spark-1.2.0-bin-hadoop2.4
+    register: st
+
+  - name: Download Spark
+    get_url:
+      url="http://d3kbcqa49mib13.cloudfront.net/spark-1.2.0-bin-hadoop2.4.tgz"
+      dest={{ansible_env.HOME}}/spark-1.2.0-bin-hadoop2.4.tgz
+    when: not st.stat.exists
+
+  - name: Extract Spark
+    command: tar xvf {{ansible_env.HOME}}/spark-1.2.0-bin-hadoop2.4.tgz -C {{ansible_env.HOME}}
+    when: not st.stat.exists
+
+  - name: Configure Spark Master launch scripts
+    template:
+      src="launch-master.sh"
+      dest="{{ansible_env.HOME}}/launch-spark-master.sh"
+      mode=0755
+
+  - name: Configure Spark Worker launch scripts
+    template:
+      src="launch-worker.sh"
+      dest="{{ansible_env.HOME}}/launch-spark-worker.sh"
+      mode=0755
+
+  - name: Configure Spark Application launch scripts
+    template:
+      src="launch-application.sh"
+      dest="{{ansible_env.HOME}}/launch-application.sh"
+      mode=0755

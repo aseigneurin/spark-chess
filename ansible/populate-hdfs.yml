@@ -1,0 +1,21 @@
+---
+  - hosts: spark-chess-master
+
+    tasks:
+
+      - name: Read the content on HDFS
+        command: "{{ansible_env.HOME}}/hadoop-2.6.0/bin/hdfs dfs -ls /"
+        register: content
+        changed_when: false
+
+      - name: First remove spark-chess code
+        command: "{{ansible_env.HOME}}/hadoop-2.6.0/bin/hdfs dfs -rm /spark-chess-0.0.1-SNAPSHOT.jar"
+        when: content.stdout.find("spark-chess-0.0.1-SNAPSHOT.jar") != -1
+
+      - name: Copy spark-chess code
+        command: "{{ansible_env.HOME}}/hadoop-2.6.0/bin/hdfs dfs -put {{ansible_env.HOME}}/spark-chess-master/target/spark-chess-0.0.1-SNAPSHOT.jar /spark-chess-0.0.1-SNAPSHOT.jar"
+
+      - name: Copy chess data
+        command: "{{ansible_env.HOME}}/hadoop-2.6.0/bin/hdfs dfs -put {{ansible_env.HOME}}/all-chess-data.pgn /chess-data-{{item}}.pgn"
+        when: content.stdout.find("chess-data-{{item}}.pgn") == -1
+        with_sequence: count=2

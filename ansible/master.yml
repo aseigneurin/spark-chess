@@ -1,0 +1,42 @@
+---
+  - hosts: spark-chess-master
+
+    roles:
+
+      - java
+      - maven
+      - spark
+      - hadoop
+      - chess-data
+      - spark-chess
+
+    tasks:
+
+      - name: Format HDFS
+        command: "{{ansible_env.HOME}}/hadoop-2.6.0/bin/hdfs namenode -format -force"
+
+
+      - name: Check if HDFS Namenode is running
+        command: "{{ansible_env.HOME}}/launch-namenode.sh status"
+        register: nn
+        changed_when: false
+
+      - name: Launch HDFS Namenode
+        command: "{{ansible_env.HOME}}/launch-namenode.sh start"
+        when: nn.stdout.find("App is running") == -1
+        sudo: yes
+        register: p
+      #- debug: var=p.stdout
+
+
+      - name: Check if Spark Master is running
+        command: "{{ansible_env.HOME}}/launch-spark-master.sh status"
+        register: sm
+        changed_when: false
+
+      - name: Launch Spark Master
+        command: "{{ansible_env.HOME}}/launch-spark-master.sh start"
+        when: sm.stdout.find("App is running") == -1
+        sudo: yes
+        register: p
+      #- debug: var=p.stdout

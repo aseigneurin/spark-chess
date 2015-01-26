@@ -1,0 +1,5 @@
+master_ip: 10.0.2.15
+master_hostname: vagrant-ubuntu-trusty-64
+spark_worker_cores: 2
+spark_worker_memory: 2G
+chess_data_copies: 2

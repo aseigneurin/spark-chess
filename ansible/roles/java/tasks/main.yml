@@ -1,0 +1,9 @@
+---
+
+  - name: Check if Java is installed
+    command: java -version
+    register: java_version
+    changed_when: false
+
+  - include: install.yml
+    when: java_version.stderr.find("1.8.0") == -1

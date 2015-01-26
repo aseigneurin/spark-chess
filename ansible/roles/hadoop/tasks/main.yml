@@ -1,0 +1,40 @@
+---
+
+  - name: Check if Hadoop is installed
+    stat: path={{ansible_env.HOME}}/hadoop-2.6.0
+    register: st
+
+  - name: Download Hadoop
+    get_url:
+      url="http://mir2.ovh.net/ftp.apache.org/dist/hadoop/common/hadoop-2.6.0/hadoop-2.6.0.tar.gz"
+      dest={{ansible_env.HOME}}/hadoop-2.6.0.tgz
+    when: not st.stat.exists
+
+  - name: Extract Hadoop
+    command: tar xvf {{ansible_env.HOME}}/hadoop-2.6.0.tgz -C {{ansible_env.HOME}}
+    when: not st.stat.exists
+
+  - name: Configure Hadoop's core-site.xml file
+    template:
+      src="core-site.xml"
+      dest="{{ansible_env.HOME}}/hadoop-2.6.0/etc/hadoop/core-site.xml"
+
+  - name: Configure Hadoop's hdfs-site.xml file
+    template:
+      src="hdfs-site.xml"
+      dest="{{ansible_env.HOME}}/hadoop-2.6.0/etc/hadoop/hdfs-site.xml"
+
+  - name: set JAVA_HOME environment variable
+    lineinfile:
+      dest={{ansible_env.HOME}}/hadoop-2.6.0/etc/hadoop/hadoop-env.sh
+      regexp='export JAVA_HOME.*'
+      line='export JAVA_HOME=/usr/lib/jvm/java-8-oracle/'
+
+  - name: Configure Namenode and Datanode launch scripts
+    template:
+      src="launch.sh"
+      dest="{{ansible_env.HOME}}/launch-{{item}}.sh"
+      mode=0755
+    with_items:
+      - namenode
+      - datanode

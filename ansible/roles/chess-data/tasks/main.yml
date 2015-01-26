@@ -1,0 +1,24 @@
+---
+
+  - name: Check if chess data is installed
+    stat: path={{ansible_env.HOME}}/ChessData-master
+    register: st
+
+  - name: Download chess data
+    get_url: 
+      url="https://github.com/rozim/ChessData/archive/master.zip"
+      dest="{{ansible_env.HOME}}/ChessData-master.zip"
+      timeout=1800
+    when: not st.stat.exists
+
+  - name: Extract chess data
+    command: unzip {{ansible_env.HOME}}/ChessData-master.zip
+    when: not st.stat.exists
+
+  - name: Check if chess data is concatenated
+    stat: path={{ansible_env.HOME}}/all-chess-data.pgn
+    register: st2
+
+  - name: Concatenate chess data
+    shell: cat {{ansible_env.HOME}}/ChessData-master/*/*.pgn >> {{ansible_env.HOME}}/all-chess-data.pgn
+    when: not st2.stat.exists

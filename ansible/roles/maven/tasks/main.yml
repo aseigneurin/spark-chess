@@ -1,0 +1,14 @@
+---
+
+  - name: Check if Maven is installed
+    stat: path={{ansible_env.HOME}}/apache-maven-3.2.5-bin
+    register: st
+
+  - name: Download Maven
+    get_url:
+      url="http://apache.websitebeheerjd.nl/maven/maven-3/3.2.5/binaries/apache-maven-3.2.5-bin.tar.gz"
+      dest={{ansible_env.HOME}}/apache-maven-3.2.5-bin.tar.gz
+
+  - name: Extract Maven
+    command: tar xvf {{ansible_env.HOME}}/apache-maven-3.2.5-bin.tar.gz -C {{ansible_env.HOME}}
+    when: not st.stat.exists
